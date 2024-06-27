@@ -29,6 +29,14 @@ const char* fragmentShaderSource = "#version 330 core\n"
                             "    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
                             "} ";
 
+const char* fragmentShaderSource2 = "#version 330 core\n"
+                                   "out vec4 FragColor;\n"
+                                   "\n"
+                                   "void main()\n"
+                                   "{\n"
+                                   "    FragColor = vec4(0.2f, 0.5f, 1.0f, 1.0f);\n"
+                                   "} ";
+
 void addShader(GLuint program, const char* source, GLenum type)
 {
     GLuint shader = glCreateShader(type);
@@ -90,7 +98,7 @@ int main() {
             0.5f, -0.25f, 1.0f
     };
 
-    GLuint VAO[2], VBO[2], shaderProgram;
+    GLuint VAO[2], VBO[2], shaderProgram, shaderProgram2;
 
     glGenVertexArrays(2, VAO);
     glBindVertexArray(VAO[0]);
@@ -135,6 +143,14 @@ int main() {
         std::cout << "Failed to validate shader program." << std::endl << infoLog << std::endl;
     }
 
+    shaderProgram2 = glCreateProgram();
+
+    addShader(shaderProgram2, vertexShaderSource, GL_VERTEX_SHADER);
+    addShader(shaderProgram2, fragmentShaderSource2, GL_FRAGMENT_SHADER);
+
+    glLinkProgram(shaderProgram2);
+
+
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
@@ -149,6 +165,8 @@ int main() {
 
         glBindVertexArray(VAO[0]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        glUseProgram(shaderProgram2);
 
         glBindVertexArray(VAO[1]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
