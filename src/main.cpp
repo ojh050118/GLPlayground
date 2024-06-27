@@ -84,7 +84,7 @@ int main() {
             1.0f, -1.0f, 1.0f   // Right
     };
 
-    GLuint VAO, VBO, vertexShader, fragmentShader, shaderProgram;
+    GLuint VAO, VBO, shaderProgram;
 
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
