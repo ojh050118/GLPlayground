@@ -78,24 +78,18 @@ int main() {
 
     // prepare to rendering
     GLfloat vertices[] = {
-            -0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f,
-            -1.0f, -0.5f, 1.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f
+            0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+            -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+            0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f
     };
 
-    GLfloat vertices2[] = {
-            1.0f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f,
-            0.0f, 0.5f, 1.0f, 0.0f, 1.0f, 0.0f,
-            0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f
-    };
+    GLuint VAO, VBO;
 
-    GLuint VAO[2], VBO[2];
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
 
-    glGenVertexArrays(2, VAO);
-    glBindVertexArray(VAO[0]);
-
-    glGenBuffers(2, VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO[0]);
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, 0);
@@ -103,17 +97,7 @@ int main() {
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
 
-    glBindVertexArray(VAO[1]);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, 0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 6, (void*)(sizeof(GLfloat) * 3));
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-
-    Shader shader = Shader(shaders.get("vertexShader.vs"), fragmentShaderSource);
-    Shader shader2 = Shader(shaders.get("vertexShader.vs"), shaders.get("fragmentShader.fs"));
+    Shader shader = Shader(shaders.get("vertexShader.vs"), shaders.get("fragmentShader.fs"));
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -127,16 +111,11 @@ int main() {
 
         glUseProgram(shader.getID());
 
-        glBindVertexArray(VAO[0]);
+        glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        glUseProgram(shader2.getID());
-
-        glBindVertexArray(VAO[1]);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
-        shader2.setFloat("time", (float)glfwGetTime());
-        shader2.setFloat("offsetx", (float)glfwGetTime());
+        shader.setFloat("time", (float)glfwGetTime());
+        shader.setFloat("offsetx", (float)glfwGetTime());
 
         glBindVertexArray(0);
         glUseProgram(0);
