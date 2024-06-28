@@ -12,8 +12,15 @@ if (APPLE)
 
 endif()
 
+# Make shader files copy to build dir
+file(COPY shaders DESTINATION ${CMAKE_BINARY_DIR})
+
 add_subdirectory(dependency/glfw)
 include_directories(include)
 link_directories(lib)
-add_executable(GLPlayground src/main.cpp src/glad.c)
+add_executable(GLPlayground src/main.cpp src/glad.c
+        src/shader.cpp
+        src/shader.h
+        src/shader_storage.cpp
+        src/shader_storage.h)
 target_link_libraries(GLPlayground ${GLFW})

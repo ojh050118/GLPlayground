@@ -1,6 +1,8 @@
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include "shader.h"
+#include "shader_storage.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -13,18 +15,6 @@ void processInput(GLFWwindow* window)
         glfwSetWindowShouldClose(window, true);
 }
 
-const char* vertexShaderSource = "#version 330 core\n"
-                          "layout (location = 0) in vec3 vPos;\n"
-                          "layout (location = 1) in vec3 vCol;\n"
-                          "\n"
-                          "out vec3 vColor;\n"
-                          "\n"
-                          "void main()\n"
-                          "{\n"
-                          "    gl_Position = vec4(0.8f * vPos.x, 0.8f * vPos.y, 0.8f * vPos.z, 1.0);\n"
-                          "    vColor = vCol;\n"
-                          "}";
-
 const char* fragmentShaderSource = "#version 330 core\n"
                                    "in vec3 vColor;\n"
                                    "out vec4 FragColor;\n"
@@ -36,16 +26,7 @@ const char* fragmentShaderSource = "#version 330 core\n"
                                    "    FragColor = vec4(vColor, 1.0f);\n"
                                    "} ";
 
-const char* fragmentShaderSource2 = "#version 330 core\n"
-                                    "in vec3 vColor;\n"
-                                    "out vec4 FragColor;\n"
-                                    "\n"
-                                    "uniform float time;\n"
-                                    "\n"
-                                    "void main()\n"
-                                    "{\n"
-                                    "    FragColor = vec4(vColor.x * abs(tan(time)), vColor.y * abs(tan(time * 2)), vColor.z * abs(tan(time * 3)), 1.0f);\n"
-                                    "} ";
+ShaderStorage shaders = ShaderStorage();
 
 void addShader(GLuint program, const char* source, GLenum type)
 {
@@ -108,7 +89,7 @@ int main() {
             0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f
     };
 
-    GLuint VAO[2], VBO[2], shaderProgram, shaderProgram2;
+    GLuint VAO[2], VBO[2];
 
     glGenVertexArrays(2, VAO);
     glBindVertexArray(VAO[0]);
@@ -131,39 +112,8 @@ int main() {
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
 
-    GLint success;
-    GLchar infoLog[1024];
-
-    shaderProgram = glCreateProgram();
-
-    addShader(shaderProgram, vertexShaderSource, GL_VERTEX_SHADER);
-    addShader(shaderProgram, fragmentShaderSource, GL_FRAGMENT_SHADER);
-
-    glLinkProgram(shaderProgram);
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-
-    if (!success)
-    {
-        glGetProgramInfoLog(shaderProgram, sizeof(infoLog), NULL, infoLog);
-        std::cout << "Failed to link shader program." << std::endl << infoLog << std::endl;
-    }
-
-    glValidateProgram(shaderProgram);
-    glGetProgramiv(shaderProgram, GL_VALIDATE_STATUS, &success);
-
-    if (!success)
-    {
-        glGetProgramInfoLog(shaderProgram, sizeof(infoLog), NULL, infoLog);
-        std::cout << "Failed to validate shader program." << std::endl << infoLog << std::endl;
-    }
-
-    shaderProgram2 = glCreateProgram();
-
-    addShader(shaderProgram2, vertexShaderSource, GL_VERTEX_SHADER);
-    addShader(shaderProgram2, fragmentShaderSource2, GL_FRAGMENT_SHADER);
-
-    glLinkProgram(shaderProgram2);
-
+    Shader shader = Shader(shaders.get("vertexShader.vs"), fragmentShaderSource);
+    Shader shader2 = Shader(shaders.get("vertexShader.vs"), shaders.get("fragmentShader.fs"));
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -175,19 +125,17 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shaderProgram);
+        glUseProgram(shader.getID());
 
         glBindVertexArray(VAO[0]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        glUniform1f(glGetUniformLocation(shaderProgram, "time"), (float)glfwGetTime());
-
-        glUseProgram(shaderProgram2);
+        glUseProgram(shader2.getID());
 
         glBindVertexArray(VAO[1]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        glUniform1f(glGetUniformLocation(shaderProgram2, "time"), (float)glfwGetTime());
+        shader2.setFloat("time", (float)glfwGetTime());
 
         glBindVertexArray(0);
         glUseProgram(0);
