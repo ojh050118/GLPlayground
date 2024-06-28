@@ -4,7 +4,9 @@ layout (location = 0) in vec3 vPos;
 layout (location = 1) in vec3 vCol;
 out vec3 vColor;
 
+uniform float offsetx;
+
 void main() {
-    gl_Position = vec4(vPos * -1.0, 1.0);
+    gl_Position = vec4(vPos.x - 0.5f + sin(offsetx), vPos.y, vPos.z, 1.0);
     vColor = vCol;
 }

@@ -136,6 +136,7 @@ int main() {
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         shader2.setFloat("time", (float)glfwGetTime());
+        shader2.setFloat("offsetx", (float)glfwGetTime());
 
         glBindVertexArray(0);
         glUseProgram(0);
