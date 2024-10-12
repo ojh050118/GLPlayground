@@ -3,7 +3,9 @@
 #include <GLFW/glfw3.h>
 #include "shader.h"
 #include "shader_storage.h"
-#include "glm/vec3.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -84,7 +86,12 @@ int main() {
             0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f
     };
 
-    GLuint VAO, VBO;
+    GLuint VAO, VBO, uniformModel;
+
+    float triOffset;
+    float triIncrement = 0.01f;
+    float maxTriOffset = 0.5f;
+    bool direction;
 
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -100,6 +107,8 @@ int main() {
 
     Shader shader = Shader(shaders.get("vertexShader.vs"), shaders.get("fragmentShader.fs"));
 
+    uniformModel = glGetUniformLocation(shader.getID(), "model");
+
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
@@ -112,11 +121,24 @@ int main() {
 
         glUseProgram(shader.getID());
 
+        if (direction)
+            triOffset += triIncrement;
+        else
+            triOffset -= triIncrement;
+
+        if (abs(triOffset) > maxTriOffset)
+            direction = !direction;
+
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(triOffset, triOffset, 0.0f));
+
+        glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES , 0, 3);
 
         shader.setFloat("time", (float)glfwGetTime());
-        shader.setFloat("offsetx", (float)glfwGetTime());
+        //shader.setFloat("model", (float)glfwGetTime());
 
         glBindVertexArray(0);
         glUseProgram(0);

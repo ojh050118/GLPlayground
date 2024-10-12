@@ -5,10 +5,10 @@ layout (location = 1) in vec3 vCol;
 out vec3 vPosition;
 out vec3 vColor;
 
-uniform float offsetx;
+uniform mat4 model;
 
 void main() {
-    gl_Position = vec4(vPos.x, vPos.y, vPos.z, 1.0);
+    gl_Position = model * vec4(vPos.x, vPos.y, vPos.z, 1.0);
     vPosition = vPos;
     vColor = vCol;
 }
