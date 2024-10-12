@@ -3,6 +3,7 @@ project(GLPlayground)
 
 set(CMAKE_CXX_STANDARD 14)
 set(GLFW glfw)
+set(GLM glm)
 
 if (APPLE)
     set(CMAKE_CXX_FLAGS "-framework Cocoa -framework IOKit")

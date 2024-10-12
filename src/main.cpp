@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include "shader.h"
 #include "shader_storage.h"
+#include "glm/vec3.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -112,7 +113,7 @@ int main() {
         glUseProgram(shader.getID());
 
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_TRIANGLES , 0, 3);
 
         shader.setFloat("time", (float)glfwGetTime());
         shader.setFloat("offsetx", (float)glfwGetTime());
