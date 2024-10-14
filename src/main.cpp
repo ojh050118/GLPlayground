@@ -29,6 +29,8 @@ const char* fragmentShaderSource = "#version 330 core\n"
                                    "    FragColor = vec4(vColor, 1.0f);\n"
                                    "} ";
 
+const float toRadians = 3.14159265f / 180.0f;
+
 ShaderStorage shaders = ShaderStorage();
 
 void addShader(GLuint program, const char* source, GLenum type)
@@ -86,9 +88,10 @@ int main() {
             0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f
     };
 
-    GLuint VAO, VBO, uniformModel;
+    GLuint VAO, VBO;
+    GLint uniformModel;
 
-    float triOffset;
+    float triOffset = 0;
     float triIncrement = 0.01f;
     float maxTriOffset = 0.5f;
     bool direction;
@@ -130,7 +133,8 @@ int main() {
             direction = !direction;
 
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(triOffset, triOffset, 0.0f));
+        model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+        //model = glm::translate(model, glm::vec3(triOffset, 0.0f, 0.0f));
 
         glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
