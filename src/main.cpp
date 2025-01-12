@@ -96,6 +96,11 @@ int main() {
     float maxTriOffset = 0.5f;
     bool direction;
 
+    bool scalingDirection = true;
+    float currentSize = 1.0f;
+    float minSize = 0.1f;
+    float maxSize = 2.0f;
+
     float rotation = 0;
 
     glGenVertexArrays(1, &VAO);
@@ -139,10 +144,19 @@ int main() {
         if (rotation >= 360)
             rotation -= 360;
 
+        if (scalingDirection)
+            currentSize += 0.002f;
+        else
+            currentSize -= 0.002f;
+
+        if (currentSize >= maxSize || currentSize <= minSize)
+            scalingDirection = !scalingDirection;
+
+
         glm::mat4 model = glm::mat4(1.0f);
-        //model = glm::rotate(model, rotation * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+        model = glm::rotate(model, rotation * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
         model = glm::translate(model, glm::vec3(triOffset, 0.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(2.0f, 2.0f, 1.0f));
+        model = glm::scale(model, glm::vec3(currentSize , currentSize, 1.0f));
 
         glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
