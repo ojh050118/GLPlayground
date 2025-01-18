@@ -11,4 +11,5 @@ void main() {
     gl_Position = model * vec4(vPos.x, vPos.y, vPos.z, 1.0);
     vPosition = vPos;
     vColor = vCol;
+    vColor = vec3(clamp(vPos, 0.0f, 1.0f));
 }
