@@ -79,6 +79,9 @@ int main() {
         return -1;
     }
 
+    int bufferWidth, bufferHeight;
+    glfwGetFramebufferSize(window, &bufferWidth, &bufferHeight);
+
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glEnable(GL_DEPTH_TEST);
 
@@ -98,7 +101,7 @@ int main() {
     };
 
     GLuint VAO, VBO, EBO;
-    GLint uniformModel;
+    GLint uniformModel, uniformProjection;
 
     float triOffset = 0;
     float triIncrement = 0.01f;
@@ -131,6 +134,10 @@ int main() {
     Shader shader = Shader(shaders.get("vertexShader.vs"), shaders.get("fragmentShader.fs"));
 
     uniformModel = glGetUniformLocation(shader.getID(), "model");
+    uniformProjection = glGetUniformLocation(shader.getID(), "projection");
+
+    // aspect = width / height
+    glm::mat4 projection = glm::perspective(45.0f, (GLfloat)bufferWidth / (GLfloat)bufferHeight, 0.1f, 100.0f);
 
     // Should unbind the EBO AFTER unbind the VAO
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -154,7 +161,7 @@ int main() {
         if (abs(triOffset) > maxTriOffset)
             direction = !direction;
 
-        rotation += 0.1f;
+        rotation += 0.2f;
 
         if (rotation >= 360)
             rotation -= 360;
@@ -169,11 +176,14 @@ int main() {
 
 
         glm::mat4 model = glm::mat4(1.0f);
+//        model = glm::translate(model, glm::vec3(triOffset, 0.0f, 0.0ff));
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));
         model = glm::rotate(model, rotation * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
-//        model = glm::translate(model, glm::vec3(triOffset, 0.0f, 0.0f));
 //        model = glm::scale(model, glm::vec3(currentSize , currentSize, 1.0f));
-//
+        model = glm::scale(model, glm::vec3(0.5f , 0.5f, 0.5f));
+
         glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 
         glBindVertexArray(VAO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
