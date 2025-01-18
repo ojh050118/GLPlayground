@@ -80,15 +80,24 @@ int main() {
     }
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glEnable(GL_DEPTH_TEST);
 
     // prepare to rendering
     GLfloat vertices[] = {
-            0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-            -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-            1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f
+            -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+            0.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+            1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+            0.0f, 1.0f, 0.0f, 0.5f, 0.5f, 0.5f
     };
 
-    GLuint VAO, VBO;
+    unsigned int indices[] = {
+            0, 3, 1,
+            1, 3, 2,
+            2, 3, 0,
+            0, 1, 2
+    };
+
+    GLuint VAO, VBO, EBO;
     GLint uniformModel;
 
     float triOffset = 0;
@@ -106,6 +115,10 @@ int main() {
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 
+    glGenBuffers(1, &EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -119,7 +132,9 @@ int main() {
 
     uniformModel = glGetUniformLocation(shader.getID(), "model");
 
+    // Should unbind the EBO AFTER unbind the VAO
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
     while (!glfwWindowShouldClose(window))
@@ -127,7 +142,7 @@ int main() {
         processInput(window);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glUseProgram(shader.getID());
 
@@ -139,7 +154,7 @@ int main() {
         if (abs(triOffset) > maxTriOffset)
             direction = !direction;
 
-        rotation += 0.05f;
+        rotation += 0.1f;
 
         if (rotation >= 360)
             rotation -= 360;
@@ -154,14 +169,18 @@ int main() {
 
 
         glm::mat4 model = glm::mat4(1.0f);
-//        model = glm::rotate(model, rotation * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+        model = glm::rotate(model, rotation * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 //        model = glm::translate(model, glm::vec3(triOffset, 0.0f, 0.0f));
 //        model = glm::scale(model, glm::vec3(currentSize , currentSize, 1.0f));
 //
         glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES , 0, 3);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
+        glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
         shader.setFloat("time", (float)glfwGetTime());
         //shader.setFloat("model", (float)glfwGetTime());
