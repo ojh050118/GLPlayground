@@ -15,6 +15,7 @@ endif()
 
 # Make shader files copy to build dir
 file(COPY shaders DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY textures DESTINATION ${CMAKE_BINARY_DIR})
 
 add_subdirectory(dependency/glfw)
 include_directories(include)
