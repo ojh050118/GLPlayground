@@ -23,5 +23,6 @@ add_executable(GLPlayground src/main.cpp src/glad.c
         src/shader.cpp
         src/shader.h
         src/shader_storage.cpp
-        src/shader_storage.h)
+        src/shader_storage.h
+        src/stb_image.h)
 target_link_libraries(GLPlayground ${GLFW})
