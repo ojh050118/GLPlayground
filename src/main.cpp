@@ -21,41 +21,9 @@ void processInput(GLFWwindow* window)
         glfwSetWindowShouldClose(window, true);
 }
 
-const char* fragmentShaderSource = "#version 330 core\n"
-                                   "in vec3 vColor;\n"
-                                   "out vec4 FragColor;\n"
-                                   "\n"
-                                   "uniform float time;\n"
-                                   "\n"
-                                   "void main()\n"
-                                   "{\n"
-                                   "    FragColor = vec4(vColor, 1.0f);\n"
-                                   "} ";
-
 const float toRadians = 3.14159265f / 180.0f;
 
 ShaderStorage shaders = ShaderStorage();
-
-void addShader(GLuint program, const char* source, GLenum type)
-{
-    GLuint shader = glCreateShader(type);
-
-    glShaderSource(shader, 1, &source, NULL);
-    glCompileShader(shader);
-
-    GLint success;
-    GLchar infoLog[1024];
-
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-
-    if (!success)
-    {
-        glGetShaderInfoLog(shader, sizeof(infoLog), NULL, infoLog);
-        std::cout << "Failed to compile vertex shader." << std::endl << infoLog << std::endl;
-    }
-
-    glAttachShader(program, shader);
-}
 
 int main() {
     glfwInit();
@@ -91,10 +59,10 @@ int main() {
     // prepare to rendering
     GLfloat vertices[] = {
             // position             // color                // texture coordinate
-            -1.0f, -1.0f, 0.0f,     1.0f, 0.0f, 0.0f,       0.0f, 1.0f,
-            0.0f, -1.0f, 1.0f,      0.0f, 1.0f, 0.0f,       0.5f, 1.0f,
-            1.0f, -1.0f, 0.0f,      0.0f, 0.0f, 1.0f,       1.0f, 1.0f,
-            0.0f, 1.0f, 0.0f,       0.5f, 0.5f, 0.5f,       0.5f, 0.0f,
+            -1.0f, -1.0f, 0.0f,     1.0f, 0.0f, 0.0f,       0.0f, 0.0f,
+            0.0f, -1.0f, 1.0f,      0.0f, 1.0f, 0.0f,       0.5f, 0.0f,
+            1.0f, -1.0f, 0.0f,      0.0f, 0.0f, 1.0f,       1.0f, 0.0f,
+            0.0f, 1.0f, 0.0f,       0.5f, 0.5f, 0.5f,       0.5f, 1.0f,
     };
 
     unsigned int indices[] = {
@@ -102,13 +70,6 @@ int main() {
             1, 3, 2,
             2, 3, 0,
             0, 1, 2
-    };
-
-    float texCoords[]
-    {
-        0.0f, 0.0f,
-        0.0f, 1.0f,
-        1.0f, 0.0f
     };
 
     GLuint VAO, VBO, EBO;
@@ -150,6 +111,7 @@ int main() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+    stbi_set_flip_vertically_on_load(true);
     unsigned char *data = stbi_load("textures/1.jpg", &imageWidth, &imageHeight, &nrChannels, 0);
 
     if (!data)
