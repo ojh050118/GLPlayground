@@ -59,17 +59,30 @@ int main() {
     // prepare to rendering
     GLfloat vertices[] = {
             // position             // color                // texture coordinate
-            -1.0f, -1.0f, 0.0f,     1.0f, 0.0f, 0.0f,       0.0f, 0.0f,
-            0.0f, -1.0f, 1.0f,      0.0f, 1.0f, 0.0f,       0.5f, 0.0f,
-            1.0f, -1.0f, 0.0f,      0.0f, 0.0f, 1.0f,       1.0f, 0.0f,
-            0.0f, 1.0f, 0.0f,       0.5f, 0.5f, 0.5f,       0.5f, 1.0f,
+            -0.5f, -0.5f, 0.5f,     1.0f, 0.0f, 0.0f,       0.0f, 0.0f,
+            0.5f, -0.5f, 0.5f,      0.0f, 1.0f, 0.0f,       1.0f, 0.0f,
+            0.5f, 0.5f, 0.5f,       0.0f, 0.0f, 1.0f,       1.0f, 1.0f,
+            -0.5f, 0.5f, 0.5f,      1.0f, 0.0f, 0.0f,       0.0f, 1.0f,
+
+            -0.5f, -0.5f, -0.5f,     1.0f, 0.0f, 0.0f,       0.0f, 0.0f,
+            0.5f, -0.5f, -0.5f,      0.0f, 1.0f, 0.0f,       1.0f, 0.0f,
+            0.5f, 0.5f, -0.5f,       0.0f, 0.0f, 1.0f,       1.0f, 1.0f,
+            -0.5f, 0.5f, -0.5f,      1.0f, 0.0f, 0.0f,       0.0f, 1.0f,
     };
 
     unsigned int indices[] = {
-            0, 3, 1,
-            1, 3, 2,
-            2, 3, 0,
-            0, 1, 2
+            0, 2, 3,
+            0, 1, 2,
+            1, 6, 2,
+            1, 5, 6,
+            5, 7, 6,
+            5, 4, 7,
+            4, 3, 7,
+            4, 0, 3,
+            0, 5, 4,
+            0, 1, 5,
+            3, 6, 7,
+            3, 2, 6
     };
 
     GLuint VAO, VBO, EBO;
@@ -178,7 +191,7 @@ int main() {
         if (abs(triOffset) > maxTriOffset)
             direction = !direction;
 
-        rotation += 0.2f;
+        rotation += 4.2f;
 
         if (rotation >= 360)
             rotation -= 360;
@@ -213,7 +226,7 @@ int main() {
         glBindVertexArray(VAO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
-        glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
