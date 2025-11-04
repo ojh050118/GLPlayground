@@ -17,13 +17,10 @@ endif()
 file(COPY shaders DESTINATION ${CMAKE_BINARY_DIR})
 file(COPY textures DESTINATION ${CMAKE_BINARY_DIR})
 
+file(GLOB_RECURSE SRC_FILES src/*.c src/*.cpp src/*.h)
+
 add_subdirectory(dependency/glfw)
 include_directories(include)
 link_directories(lib)
-add_executable(GLPlayground src/main.cpp src/glad.c
-        src/shader.cpp
-        src/shader.h
-        src/shader_storage.cpp
-        src/shader_storage.h
-        src/stb_image.h)
+add_executable(GLPlayground ${SRC_FILES})
 target_link_libraries(GLPlayground ${GLFW})
